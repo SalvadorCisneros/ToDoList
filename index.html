@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="main.css">
+
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TDL</title>
+</head>
+
+<body>
+  <div class="main-container">
+    <div class="left-side">
+      <h2>Tasks</h2>
+      <ul id="task-list">
+
+      </ul>
+    </div>
+
+    <div class="right-side">
+      <input type="text" id="task-name" placeholder="Task Name">
+      <input type="text" id="task-description" placeholder="Task Description">
+      <input type="date" id="task-date">
+
+      <button id="done" onclick="addTask()">Done</button>
+    </div>
+  </div>
+
+  <div id="task-details">
+    <a id="close-details" class="material-symbols-outlined" onclick="closeTaskDetails()">close</a>
+    <div id="text-details" class="text-details">
+      <h3>Task Details</h3>
+      <p><strong>Name:</strong> <span id="details-name"></span></p>
+      <p><strong>Description:</strong> <span id="details-description"></span></p>
+      <p><strong>Date:</strong> <span id="details-date"></span></p>
+
+      <a onclick="showEditForm()" id="edit-btn">Edit</a>
+    </div>
+    <form id="edit-form">
+      <label for="edit-name">Name:</label>
+      <input type="text" id="edit-name" required>
+
+      <label for="edit-description">Description:</label>
+      <input type="text" id="edit-description">
+
+      <label for="edit-date">Date:</label>
+      <input type="date" id="edit-date" required>
+
+      <button type="button" onclick="saveTaskChanges()">Save</button>
+    </form>
+  </div>
+
+  <script>
+
+    function addTask() {
+      const taskNameInput = document.getElementById('task-name');
+      const taskDescriptionInput = document.getElementById('task-description');
+      const taskDateInput = document.getElementById('task-date');
+
+      if (taskNameInput.value.trim() === '') {
+        alert('Por favor, ingresa un nombre para la tarea.');
+        return;
+      }
+
+      else if (taskDateInput.value.trim() === '') {
+        alert('Por favor, ingresa una fecha para la tarea.');
+        return;
+      }
+
+      const taskName = taskNameInput.value;
+      const taskDescription = taskDescriptionInput.value;
+      const taskDate = taskDateInput.value;
+
+      const task = {
+        name: taskName,
+        description: taskDescription,
+        date: taskDate,
+      };
+
+      const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+      tasks.push(task);
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+
+      displayTasks();
+
+      taskNameInput.value = '';
+      taskDescriptionInput.value = '';
+      taskDateInput.value = '';
+    }
+
+    function showTaskDetails(index) {
+      const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+      const task = tasks[index];
+
+      document.getElementById('details-name').textContent = task.name;
+      document.getElementById('details-description').textContent = task.description;
+      document.getElementById('details-date').textContent = task.date;
+
+      const taskDetails = document.getElementById('task-details');
+      taskDetails.style.display = 'block';
+
+      const editName = document.getElementById('edit-name');
+      const editDescription = document.getElementById('edit-description');
+      const editDate = document.getElementById('edit-date');
+      editName.value = task.name;
+      editDescription.value = task.description;
+      editDate.value = task.date;
+      editName.dataset.index = index;
+    }
+
+    function displayTasks() {
+      const taskList = document.getElementById('task-list');
+      taskList.innerHTML = '';
+
+      const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+      tasks.forEach((task, index) => {
+        const listItem = document.createElement('li');
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth();
+        const currentDay = currentDate.getDate();
+
+        const taskDate = new Date(task.date);
+        const taskYear = taskDate.getFullYear();
+        const taskMonth = taskDate.getMonth();
+        const taskDay = taskDate.getDate();
+
+
+        if (taskYear === currentYear && taskMonth === currentMonth && taskDay + 1 === currentDay) {
+ 
+          listItem.innerHTML =
+            `
+        <span id="today" class="material-symbols-outlined">pending_actions</span>
+        <a href="javascript:void(0);" onclick="showTaskDetails(${index})">${task.name} - ${task.date}</a>
+        <span id="delete" class="material-symbols-outlined"onclick="removeTask(${index})">delete</span>
+        `;
+
+        }
+        else if (taskYear >= currentYear && taskMonth >= currentMonth && taskDay + 1 >= currentDay + 1) {
+          listItem.innerHTML =
+            `
+        <span id="good" class="material-symbols-outlined">pending_actions</span>
+        <a href="javascript:void(0);" onclick="showTaskDetails(${index})">${task.name} - ${task.date}</a>
+        <span id="delete" class="material-symbols-outlined"onclick="removeTask(${index})">delete</span>
+      `;
+        }
+
+        else if (taskDate < currentDate) {
+          listItem.innerHTML =
+            `
+        <span id="bad" class="material-symbols-outlined">pending_actions</span>
+        <a href="javascript:void(0);" onclick="showTaskDetails(${index})">${task.name} - ${task.date}</a>
+        <span id="delete" class="material-symbols-outlined"onclick="removeTask(${index})">delete</span>
+      `;
+        }
+
+        taskList.appendChild(listItem);
+      });
+
+    }
+
+    function removeTask(index) {
+      const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+      tasks.splice(index, 1);
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+      displayTasks();
+    }
+
+    function showEditForm() {
+
+      const taskDetails = document.getElementById('text-details');
+      const editForm = document.getElementById('edit-form');
+      taskDetails.style.display = 'none';
+      editForm.style.display = 'flex';
+    }
+
+    function saveTaskChanges() {
+      const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+      const editName = document.getElementById('edit-name');
+      const editDescription = document.getElementById('edit-description');
+      const editDate = document.getElementById('edit-date');
+      const index = editName.dataset.index;
+
+      if (editName.value.trim() === '') {
+        alert('Por favor, ingresa un nombre para la tarea.');
+        return;
+      }
+
+      else if (editDate.value.trim() === '') {
+        alert('Por favor, ingresa una fecha para la tarea.');
+        return;
+      }
+
+      tasks[index].name = editName.value;
+      tasks[index].description = editDescription.value;
+      tasks[index].date = editDate.value;
+
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+
+      displayTasks();
+
+      const taskDetails = document.getElementById('text-details');
+      const editForm = document.getElementById('edit-form');
+      taskDetails.style.display = 'flex';
+      editForm.style.display = 'none';
+
+      showTaskDetails(index);
+    }
+
+    function closeTaskDetails() {
+      const taskDetails = document.getElementById('task-details');
+      taskDetails.style.display = 'none';
+
+    }
+
+    displayTasks();
+  </script>
+</body>
+
+</html>
