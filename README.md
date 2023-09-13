@@ -12,7 +12,10 @@ En el lado izquierdo se muestran la lista de las tareas creadas, del lado derech
 
 ![image](https://github.com/SalvadorCisneros/ToDoList/assets/77074008/a6017744-727b-4cc4-800b-7f41ef79be6d)
 
-El icono de basura sirve para eliminar la tarea del lado izquiero se muestra un icono de calendariolos colores representan rojo fecha vencida, amarillo dia actual, verde tiempo disponible.
+El icono de basura sirve para eliminar la tarea del lado izquiero se muestra un icono de calendariolos colores representan:
+- rojo fecha vencida.
+- amarillo dia actual.
+- verde tiempo disponible.
 
 ![image](https://github.com/SalvadorCisneros/ToDoList/assets/77074008/b9d803df-6808-491c-b708-2e131d415bc5)
 
